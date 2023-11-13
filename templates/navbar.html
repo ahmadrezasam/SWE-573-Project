@@ -1,0 +1,31 @@
+{% load static %}
+<!-- <div class="d-flex align-items-center py-1 py-md-4">
+  <a class="navbar-brand m-auto text-center px-2" href=".">
+    <img src="{% static 'img/logo2.jpg' %}" alt="mmmYummy" width="255">
+  </a>
+</div> -->
+<nav class="navbar navbar-expand-md has-header-inner px-0 py-0">
+  <a class="navbar-brand m-auto text-center px-2" href="{% url 'home'%}">
+    <img src="{% static 'img/logo2.jpg' %}" alt="mmmYummy" width="150">
+  </a>
+  <div class="navbar-collapse justify-content-center">
+    <ul class="navbar-nav mr-auto"> 
+      <li class="nav-item">
+        <a class="nav-link" href="#">Home Page</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Recipe Page</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Pages</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Elements</a>
+      </li>
+    </ul>
+  </div>
+  <div class="class= d-flex">
+    <a class="btn btn-primary register" href="#">Register</a>
+    <a class="btn btn-secondary login" href="#" style="margin-left: 1rem;">Login</a>
+  </div>
+</nav>
