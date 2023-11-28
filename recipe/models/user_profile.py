@@ -9,15 +9,22 @@ class UserProfile(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)  # Height in centimeters
     weight = models.PositiveIntegerField(null=True, blank=True)  # Weight in kilograms
     country = CountryField(blank_label='(select country)', null=True, blank=True)
-    diet_goals = models.ManyToManyField('DietGoal', null=True, blank=True)
-    food_allergens = models.ManyToManyField('FoodAllergen', null=True, blank=True)
+    diet_goals = models.ManyToManyField('DietGoal', null=True, blank=True) #lose weight, gain weight, ...
+    food_allergens = models.ManyToManyField('FoodAllergen', null=True, blank=True) 
 
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
 
+    FOOD_PREFERENCE_CHOICES = [
+        ('c', 'Omnivore'),
+        ('vegan', 'Vegan'),
+        ('vegetarian', 'Vegetarian'),
+    ]
+    food_preference = models.CharField(max_length=15, choices=FOOD_PREFERENCE_CHOICES, null=True, blank=True)
+    
 class FoodAllergen(models.Model):
     name = models.CharField(max_length=100)
     

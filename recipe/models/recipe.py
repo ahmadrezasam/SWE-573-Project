@@ -6,13 +6,13 @@ from .user_interaction import UserRating
 class Recipe(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    category = models.ManyToManyField('category', null=True, blank=True)
+    category = models.ManyToManyField('Category', null=True, blank=True) #Breakfast, lunch, dinner, ...
     description = models.TextField()
-    ingredients = models.JSONField()
-    instructions = models.JSONField()
+    ingredients = models.JSONField() # Dictionary { Ingredient : Amount}
+    instructions = models.JSONField() # List [step1, step2, step3, ...]
     # photos = models.ImageField(upload_to='recipe_photos/')
     videos = models.URLField(null=True, blank=True)
-    nutrition_facts = models.JSONField(null=True, blank=True)
+    nutrition_facts = models.JSONField(null=True, blank=True) #Dictionary {Nutrition(ex.protein) : Amount}
     preparation_time = models.PositiveIntegerField(null=True, blank=True)  # Time in minutes
     cooking_time = models.PositiveIntegerField(null=True, blank=True)  # Time in minutes
     created_at = models.DateTimeField(auto_now_add=True)
@@ -34,7 +34,7 @@ class Recipe(models.Model):
 
         self.save()
 
-class category(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=100)
     
     def __str__(self):
