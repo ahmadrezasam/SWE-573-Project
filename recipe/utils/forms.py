@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from ..models import Recipe, Category, UserProfile, User, DietGoal
+from ..models import Recipe, Category, UserProfile, User, DietGoal, UserComment
 
 class RecipeForm(ModelForm):
     class Meta:
@@ -42,5 +42,14 @@ class UserProfileForm(ModelForm):
 
     diet_goals = forms.ModelMultipleChoiceField(
         queryset=DietGoal.objects.all(),
-        widget=forms.RadioSelect(attrs={'class': ''}),
+        widget=forms.RadioSelect,
+        required = False
     )
+
+#------------------------------------------------------------
+
+class UserCommentForm(ModelForm):
+    class Meta:
+        model = UserComment
+        fields = ['comment_text']
+

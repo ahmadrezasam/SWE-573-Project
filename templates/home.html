@@ -1,32 +1,51 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
+
+<style>
+    .ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+</style>
+<div class="d-flex">
+    <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2 d-inline-block" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-5 my-sm-0" type="submit">Search</button>
+    </form>
+</div>
+
 <div class="row row-cols-1 row-cols-md-3 g-4 my-3">
     {% for recipe in recipes %}
     <a href="{% url 'recipe' recipe.id %}" class="text-decoration-none">
         <div class="col">
-            <div class="card h-10">
+            <div class="card custom-card">
                 <img src="{% static 'img/ex1.jpg' %}" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="card-title">{{recipe.title}}</h5>
-                        <p class="card-text" style="max-height: 10px;"><small class="text-body-secondary"> <img
-                                    src="{% static 'icon/user.svg' %}" alt=""> {{recipe.creator.username}}</small></p>
-                    </div>
-                    <p class="card-text">{{recipe.description}}</p>
-                    <div class="d-flex justify-content-between">
-                        <p class="card-text"><small class="text-body-secondary">Total time: {{recipe.total_time}}
-                                minutes</small>
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <h5 class="card-title ellipsis" style="max-width: 75%; flex-shrink: 0;">{{recipe.title}}</h5>
+                        <p class="card-text" style="max-height: 10px; flex-shrink: 0;">
+                            <small class="text-body-secondary">
+                                <img src="{% static 'icon/user.svg' %}" alt=""> {{recipe.creator.username}}
+                            </small>
                         </p>
-                        <p class="card-text"><small class="text-body-secondary">3/5</small></p>
+                    </div>
+                    <p class="card-text ellipsis">{{recipe.description}}</p>
+                    <div class="d-flex justify-content-between">
+                        <p class="card-text ellipsis">
+                            <small class="text-body-secondary">Total time: {{recipe.total_time}} minutes</small>
+                        </p>
+                        <p class="card-text ellipsis"><small class="text-body-secondary">3/5</small></p>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>                  
     </a>
     {% endfor %}
     <footer>
-        
+
     </footer>
 </div>
 {% endblock content %}

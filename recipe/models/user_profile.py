@@ -24,6 +24,9 @@ class UserProfile(models.Model):
         ('vegetarian', 'Vegetarian'),
     ]
     food_preference = models.CharField(max_length=15, choices=FOOD_PREFERENCE_CHOICES, null=True, blank=True)
+
+    def __str__(self):
+        return f'UserProfile for {self.user.username}'
     
 class FoodAllergen(models.Model):
     name = models.CharField(max_length=100)

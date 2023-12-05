@@ -8,3 +8,4 @@ db.sql
 media
 .env 
 env/ 
+.vscode

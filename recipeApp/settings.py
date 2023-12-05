@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cf38@^%hvw$^q#@$=!8@4-z%!+^0)r@)2qtz1@a$0_uxm2s@qz'
 
+FDC_API_KEY = config('FDC_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
