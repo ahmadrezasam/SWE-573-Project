@@ -10,13 +10,13 @@ class Recipe(models.Model):
     description = models.TextField()
     ingredients = models.JSONField() # Dictionary { Ingredient : Amount}
     instructions = models.JSONField() # List [step1, step2, step3, ...]
-    # photos = models.ImageField(upload_to='recipe_photos/')
+    images = models.ImageField(null=True, blank=True, upload_to='images/')
     videos = models.URLField(null=True, blank=True)
     nutrition_facts = models.JSONField(null=True, blank=True) #Dictionary {Nutrition(ex.protein) : Amount}
     preparation_time = models.PositiveIntegerField(null=True, blank=True)  # Time in minutes
     cooking_time = models.PositiveIntegerField(null=True, blank=True)  # Time in minutes
     created_at = models.DateTimeField(auto_now_add=True)
-    # avg_rating = models.FloatField(default=0)
+    avg_rating = models.FloatField(default=0)
 
     def calculate_avg_rating(self):
         ratings = UserRating.objects.filter(recipe=self)

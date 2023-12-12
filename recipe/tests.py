@@ -20,7 +20,7 @@ class UserProfileTest(TestCase):
             'weight': 70,
             'country': 'US',
             'gender': 'M',
-            'food_preference': 'Omnivore',
+            'food_preference': 'vegan',
         }
 
     def test_user_profile_creation(self):

@@ -1,17 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
+from django.contrib import messages
 from django.http import JsonResponse
 import random, json
 
 from django.conf import settings
 
-from ..utils.utils import calculate_total_time
+from ..utils.utils import calculate_total_time, calculate_nutrition
 from ..utils.forms import RecipeForm, UserCommentForm
 from ..models import Recipe, UserComment, UserBookmark
 from . import user_interaction
 
-from ..api.food_data_central import get_fdc_data
+# from ..api.food_data_central import get_fdc_data
 
 def get_random_recipes():
     recipes = Recipe.objects.all()
@@ -43,16 +44,24 @@ def process_recipe_form(request):
 
     return recipe, instructions_data, full_ingredients_data
 
-def save_recipe_and_redirect(recipe, instructions_data, full_ingredients_data):
+def save_recipe_and_redirect(recipe_form, instructions_data, full_ingredients_data):
     with transaction.atomic():
-        new_recipe = recipe.save(commit=False)
+        new_recipe = recipe_form.save(commit=False) 
         new_recipe.instructions = instructions_data
         new_recipe.ingredients = full_ingredients_data
+        if new_recipe.ingredients != full_ingredients_data:
+            new_recipe.nutrition_facts = calculate_nutrition(new_recipe.ingredients)
         new_recipe.save()
-        recipe.save_m2m()  # Save many-to-many relationships if any
+        recipe_form.save_m2m()  # Save many-to-many relationships if any
         return redirect('home')
 
 def home(request):
+    # if request.method == 'GET':
+    #     query = request.GET.get('q', '')
+    #     print("query", query)
+    #     recipes = Recipe.objects.filter(title__icontains=query)
+    #     return render(request, 'home.html', {'recipes': recipes})
+
     random_recipes = get_random_recipes()
     for recipe in random_recipes:
         preparation_time_recipe_data(recipe)
@@ -84,15 +93,32 @@ def recipe(request, id):
     return render(request, 'recipe.html', context)
 
 def add_recipe(request):
-    recipe, instructions_data, full_ingredients_data = process_recipe_form(request)
+    recipe_form, instructions_data, full_ingredients_data = process_recipe_form(request)
 
-    if request.method == 'POST' and recipe.is_valid():
-        return save_recipe_and_redirect(recipe, instructions_data, full_ingredients_data)
+    if request.method == 'POST' and recipe_form.is_valid():
+        return save_recipe_and_redirect(recipe_form, instructions_data, full_ingredients_data)
     else:
-        print(recipe.errors)
+        print(recipe_form.errors)
 
-    context = {'recipe': recipe}
+    context = {'recipe': recipe_form}
     return render(request, 'add-recipe.html', context)
+
+def edit_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    recipe_form = RecipeForm(instance=recipe)
+    existing_instructions = recipe.instructions
+    existing_ingredients = recipe.ingredients
+
+    if request.method == 'POST':
+        recipe_form = RecipeForm(request.POST, instance=recipe)
+        if recipe_form.is_valid():
+            print("recipe_form is valid")
+            return save_recipe_and_redirect(recipe_form, existing_instructions, existing_ingredients)
+        else:
+            print(recipe_form.errors)
+
+    context = {'recipe': recipe, 'recipe_form': recipe_form, 'existing_steps': existing_instructions, 'existing_ingredients': existing_ingredients}
+    return render(request, 'edit-recipe.html', context)
 
 def delete_recipe(request):
     try:
@@ -103,3 +129,14 @@ def delete_recipe(request):
     except Exception as e:
         print(f"Error deleting Recipe: {e}")
         return JsonResponse({"success": False, "error": str(e)})
+
+
+
+# def search(request):
+    query = request.GET.get('query')
+    recipes = Recipe.objects.filter(title__icontains=query)
+    for recipe in recipes:
+        preparation_time_recipe_data(recipe)
+
+    context = {'recipes': recipes}
+    return render(request, 'search.html', context)

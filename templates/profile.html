@@ -49,7 +49,6 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-
 </style>
 <div class="row">
     <div class="col-md-4">
@@ -167,12 +166,17 @@
             </div>
 
             <!-- Food Allergens -->
-            <div class="my-3 columns col-md-6">
-                <label>Food Allergens:</label>
-                <div class="d-flex justify-content-around">
-
+            <div class="my-3 columns col-md-12">
+                <label class="mb-2">Food Allergens:</label>
+                <div class="d-flex flex-wrap">
+                    {% for food_allergen in user_profile_form.food_allergens %}
+                    <div class="mb-3 me-4">
+                        {{ food_allergen }}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
+
             <div class="col text-center mt-5">
                 <button type="submit" class="btn btn-success">Save Changes</button>
             </div>
@@ -246,7 +250,9 @@
             // RECIPE
             if (event.target.classList.contains("delete-recipe")) {
                 const recipeId = event.target.dataset.recipeId;
-                const isConfirmed = confirm(`Are you sure you want to delete this recipe (id: ${recipeId})?`);
+                const row = event.target.closest('tr');
+                const recipeTitle = row.querySelector('.name-cell a').innerText;
+                const isConfirmed = confirm(`Are you sure you want to delete this recipe (Title: ${recipeTitle})?`);
 
                 if (isConfirmed) {
                     const url = `/delete_recipe/?id=${recipeId}`;

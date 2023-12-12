@@ -13,7 +13,7 @@
         <td class="name-cell"><a href="{% url 'recipe' recipe.id %}">{{ recipe.title }}</a></td>
         <td class="description-cell">{{ recipe.description }}</td>
         <td style=" text-align: right;">
-            <a href="" class="btn btn-outline-info me-3">Edit</a>
+            <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-outline-info me-3">Edit</a>
             <button class="btn btn-outline-danger delete-recipe" data-recipe-id="{{ recipe.id }}">Delete</button>
         </td>
     </tr>

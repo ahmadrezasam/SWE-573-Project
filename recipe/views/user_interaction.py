@@ -71,10 +71,7 @@ def delete_comment(request):
         comment_id = request.GET.get('id')
         comment = get_object_or_404(UserComment, pk=comment_id)
         comment.delete()
-
         return JsonResponse({"success": True, "message": "Comment deleted successfully"})
     except Exception as e:
-        # Log the error or handle it appropriately
         print(f"Error deleting comment: {e}")
-
         return JsonResponse({"success": False, "error": str(e)})
