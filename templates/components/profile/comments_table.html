@@ -1,6 +1,6 @@
 <thead>
     <tr>
-        <th scope="col" class="id-cell">Comment ID</th>
+        <!-- <th scope="col" class="id-cell">Comment ID</th> -->
         <th scope="col">Recipe Title</th>
         <th scope="col">Comment Text</th>
         <th scope="col"></th>
@@ -9,7 +9,7 @@
 <tbody>
     {% for comment in comments %}
     <tr>
-        <th scope="row" class="id-cell">{{ comment.id }}</th>
+        <!-- <th scope="row" class="id-cell">{{ comment.id }}</th> -->
         <td class="name-cell"><a href="{% url 'recipe' comment.recipe.id %}">{{ comment.recipe.title }}</a></td>
         <td class="description-cell">{{ comment.comment_text }}</td>
         <td style=" text-align: right;">

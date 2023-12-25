@@ -1,0 +1,12 @@
+<div class="my-3 col-md-6 columns">
+    <h4>{{ recipe.title.label_tag }}</h4>
+    {% if not edit_mode %}
+    <input type="text" class="form-control" id="title" name="{{ recipe.title.name }}">
+    {% else %}
+    <h4>{{ recipe_form.title.label_tag }}</h4>
+    <input type="text" class="form-control" id="title" name="{{ recipe_form.title.name }}"
+        value="{{ recipe_form.title.value }}">
+    {% endif %}
+</div>
+
+

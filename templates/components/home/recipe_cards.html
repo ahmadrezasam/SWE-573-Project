@@ -1,0 +1,27 @@
+{% load static %}
+{% for recipe in recipes %}
+<a href="{% url 'recipe' recipe.id %}" class="text-decoration-none">
+    <div class="col">
+        <div class="card custom-card">
+            <img src="{% static 'img/ex1.jpg' %}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between">
+                    <h5 class="card-title ellipsis" style="max-width: 75%; flex-shrink: 0;">{{recipe.title}}</h5>
+                    <p class="card-text" style="max-height: 10px; flex-shrink: 0;">
+                        <small class="text-body-secondary">
+                            <img src="{% static 'icon/user.svg' %}" alt=""> {{recipe.creator.username}}
+                        </small>
+                    </p>
+                </div>
+                <p class="card-text ellipsis">{{recipe.description}}</p>
+                <div class="d-flex justify-content-between">
+                    <p class="card-text ellipsis">
+                        <small class="text-body-secondary">Total time: {{recipe.total_time}} minutes</small>
+                    </p>
+                    <p class="card-text ellipsis"><small class="text-body-secondary">3/5</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+{% endfor %}

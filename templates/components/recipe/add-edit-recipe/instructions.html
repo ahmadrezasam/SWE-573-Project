@@ -1,0 +1,50 @@
+<!-- Instuctions start -->
+<div class="my-2">
+    <div class="d-flex justify-content-between">
+        <h4>Steps</h4>
+        <button type="button" class="btn btn-info btn-circle btn-circle-add m-1 px-2 add-step">Add step<i
+                class="bi bi-plus-lg add-step ps-1"></i></button>
+    </div>
+    <div id="steps" class="row">
+        {% if not edit_mode %}
+        <div class="step col-md-12 my-2" data-step-id="1">
+            <div class="row">
+                <div class="col-auto align-self-center pe-0">
+                    <label for="{{ step.id_for_label }}">Step 1:</label>
+                </div>
+                <div class="col-md-10">
+                    <input type="text" name="instructions" id="id_instructions_${newStepId}" class="form-control">
+                </div>
+                <div class="col-auto ps-0">
+                    <button type="button"
+                        class="btn btn-warning btn-circle btn-circle-sm m-1 remove-step align-self-center">
+                        <i class="bi bi-dash remove-step"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        {% for step in existing_steps %}
+        <div class="step col-md-12 my-2" data-step-id="{{ forloop.counter }}">
+            <div class="row">
+                <div class="col-auto align-self-center pe-0">
+                    <label for="id_instructions_{{ forloop.counter }}">Step {{ forloop.counter }}:</label>
+                </div>
+                <div class="col-md-10">
+                    <input type="text" name="instructions" id="id_instructions_{{ forloop.counter }}"
+                        class="form-control" value="{{ step }}">
+                </div>
+                <div class="col-auto ps-0">
+                    <button type="button"
+                        class="btn btn-warning btn-circle btn-circle-sm m-1 remove-step align-self-center"
+                        onclick="removeStepField(this)">
+                        <i class="bi bi-dash remove-step"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+<!-- Instuctions end -->

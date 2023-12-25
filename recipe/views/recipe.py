@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import random, json
 
@@ -29,8 +28,65 @@ def get_comments_for_recipe(recipe):
 def handle_comment_post(request, recipe_id):
     user_interaction.add_comment(request, recipe_id)
 
-def process_recipe_form(request):
-    recipe = RecipeForm(request.POST)
+def search(request):
+    query = request.GET.get('q', '')
+    print("query", query)
+    recipes = Recipe.objects.filter(title__icontains=query)
+
+    context = {'recipes': recipes, 'query': query}
+    return render(request, 'components/home/search_result.html', context)
+
+def home(request):
+    random_recipes = get_random_recipes()
+    for recipe in random_recipes:
+        preparation_time_recipe_data(recipe)
+
+    context = {'recipes': random_recipes}
+    return render(request, 'home.html', context)
+
+def recipe(request, id):
+    recipe = get_object_or_404(Recipe, id=id)
+    allergy_foods = set()
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        user_profile = request.user.userprofile
+        allergic_ingredients = set(user_profile.food_allergens.values_list('name', flat=True))
+        recipe_ingredients = set(recipe.ingredients.keys())
+        
+        allergy_foods = allergic_ingredients.intersection(recipe_ingredients)
+        print(allergy_foods)
+        
+        # Use boolean values directly
+        allergy_alert = bool(allergy_foods)
+    else:
+        allergy_alert = False
+
+    comments = get_comments_for_recipe(recipe)
+    comment_form = UserCommentForm()
+
+    comments = get_comments_for_recipe(recipe)
+    comment_form = UserCommentForm()
+    print(request.user.id)
+    is_bookmarked = UserBookmark.objects.filter(user=request.user.id, recipe=recipe).exists()
+    print(is_bookmarked)
+
+    if request.method == 'POST':
+        handle_comment_post(request, id)
+
+    context = {
+        'recipe': recipe,
+        'comments': comments,
+        'comment_form': comment_form,
+        'allergy_alert': allergy_alert,
+        'allergy_foods': allergy_foods,
+        'is_bookmarked': is_bookmarked,
+    }
+    
+    return render(request, 'recipe.html', context)
+
+@login_required(login_url='login')
+def add_recipe(request):
+    recipe_form = RecipeForm(request.POST)
 
     amounts = request.POST.getlist('amounts')  
     amount_units = request.POST.getlist('amountUnits')  
@@ -42,69 +98,31 @@ def process_recipe_form(request):
 
     full_ingredients_data = {ingredient: f"{amount} {unit}" for ingredient, amount, unit in zip(ingredients, amounts, amount_units)}
 
-    return recipe, instructions_data, full_ingredients_data
-
-def save_recipe_and_redirect(recipe_form, instructions_data, full_ingredients_data):
-    with transaction.atomic():
-        new_recipe = recipe_form.save(commit=False) 
-        new_recipe.instructions = instructions_data
-        new_recipe.ingredients = full_ingredients_data
-        if new_recipe.ingredients != full_ingredients_data:
-            new_recipe.nutrition_facts = calculate_nutrition(new_recipe.ingredients)
-        new_recipe.save()
-        recipe_form.save_m2m()  # Save many-to-many relationships if any
-        return redirect('home')
-
-def home(request):
-    # if request.method == 'GET':
-    #     query = request.GET.get('q', '')
-    #     print("query", query)
-    #     recipes = Recipe.objects.filter(title__icontains=query)
-    #     return render(request, 'home.html', {'recipes': recipes})
-
-    random_recipes = get_random_recipes()
-    for recipe in random_recipes:
-        preparation_time_recipe_data(recipe)
-    
-    # fdc_data = get_fdc_data()
-    # print(fdc_data)
-
-    context = {'recipes': random_recipes}
-    return render(request, 'home.html', context)
-
-def recipe(request, id):
-    recipe = get_object_or_404(Recipe, id=id)
-    comments = get_comments_for_recipe(recipe)
-    comment_form = UserCommentForm()
-
-    is_bookmarked = UserBookmark.objects.filter(user=1, recipe=recipe).exists()
-    if is_bookmarked:
-        recipe.is_bookmarked = True
-    else:
-        recipe.is_bookmarked = False
-
-    print(recipe.is_bookmarked)
-
-    if request.method == 'POST':
-        handle_comment_post(request, recipe.id)
-
-    context = {'recipe': recipe, 'comments': comments, 'comment_form': comment_form}
-    
-    return render(request, 'recipe.html', context)
-
-def add_recipe(request):
-    recipe_form, instructions_data, full_ingredients_data = process_recipe_form(request)
-
     if request.method == 'POST' and recipe_form.is_valid():
-        return save_recipe_and_redirect(recipe_form, instructions_data, full_ingredients_data)
+        with transaction.atomic():
+            new_recipe = recipe_form.save(commit=False) 
+            new_recipe.instructions = instructions_data
+            new_recipe.ingredients = full_ingredients_data
+            new_recipe.creator = request.user
+            # if new_recipe.ingredients != full_ingredients_data:
+            new_recipe.nutrition_facts = calculate_nutrition(new_recipe.ingredients)
+            new_recipe.save()
+            recipe_form.save_m2m()  # Save many-to-many relationships if any
+            return redirect('home')
     else:
         print(recipe_form.errors)
 
     context = {'recipe': recipe_form}
     return render(request, 'add-recipe.html', context)
 
+@login_required(login_url='login')
 def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
+
+    if request.user != recipe.creator:
+        return redirect('profile')
+    
+    edit_mode = True
     recipe_form = RecipeForm(instance=recipe)
     existing_instructions = recipe.instructions
     existing_ingredients = recipe.ingredients
@@ -112,14 +130,35 @@ def edit_recipe(request, recipe_id):
     if request.method == 'POST':
         recipe_form = RecipeForm(request.POST, instance=recipe)
         if recipe_form.is_valid():
-            print("recipe_form is valid")
-            return save_recipe_and_redirect(recipe_form, existing_instructions, existing_ingredients)
+            with transaction.atomic():
+                new_recipe = recipe_form.save(commit=False) 
+
+                amounts = request.POST.getlist('amounts')  
+                amount_units = request.POST.getlist('amountUnits')  
+                ingredients = request.POST.getlist('ingredients')  
+                instructions = request.POST.getlist('instructions')  
+
+                instructions_data = json.dumps(instructions)
+                instructions_data = json.loads(instructions_data)
+
+                full_ingredients_data = {ingredient: f"{amount} {unit}" for ingredient, amount, unit in zip(ingredients, amounts, amount_units)}
+
+                new_recipe.instructions = instructions_data
+                new_recipe.ingredients = full_ingredients_data
+
+                if new_recipe.ingredients != existing_ingredients and new_recipe.ingredients != {} and existing_ingredients != {}:
+                    new_recipe.nutrition_facts = calculate_nutrition(new_recipe.ingredients)
+
+                new_recipe.save()
+                recipe_form.save_m2m()  # Save many-to-many relationships if any
+                return redirect('home')        
         else:
             print(recipe_form.errors)
 
-    context = {'recipe': recipe, 'recipe_form': recipe_form, 'existing_steps': existing_instructions, 'existing_ingredients': existing_ingredients}
+    context = {'recipe': recipe, 'recipe_form': recipe_form, 'existing_steps': existing_instructions, 'existing_ingredients': existing_ingredients, 'edit_mode': edit_mode}
     return render(request, 'edit-recipe.html', context)
 
+@login_required(login_url='login')
 def delete_recipe(request):
     try:
         recipe_id = request.GET.get('id')
@@ -129,14 +168,3 @@ def delete_recipe(request):
     except Exception as e:
         print(f"Error deleting Recipe: {e}")
         return JsonResponse({"success": False, "error": str(e)})
-
-
-
-# def search(request):
-    query = request.GET.get('query')
-    recipes = Recipe.objects.filter(title__icontains=query)
-    for recipe in recipes:
-        preparation_time_recipe_data(recipe)
-
-    context = {'recipes': recipes}
-    return render(request, 'search.html', context)

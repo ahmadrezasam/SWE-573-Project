@@ -7,12 +7,10 @@ class UserBookmark(models.Model):
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
 class UserLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
 class UserComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

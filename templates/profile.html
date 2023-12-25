@@ -50,6 +50,10 @@
         white-space: nowrap;
     }
 </style>
+<div class="my-3">
+    <a class="text-decoration-none" href="{% url 'home' %}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go
+        back to home</a>
+</div>
 <div class="row">
     <div class="col-md-4">
         <div class="border rounded sidebar my-5 text-center container-fluid vh-100 mt-3 mb-3 full-height-container"
@@ -68,8 +72,11 @@
                 <p>{{ user_profile.description }}</p>
             </div>
 
-            <div class="text-center mb-0" style="position: absolute; bottom: 1rem; left:0; right: 0;">
-                <a href="{% url 'add-recipe' %}" class="btn btn-info">Add Recipe</a>
+            <div class="text-center mb-0 d-flex justify-content-around"
+                style="position: absolute; bottom: 1rem; left:0; right: 0;">
+                <a href="{% url 'logout' %}" class="btn btn-danger d-inline-block">Logout</a>
+                <a href="{% url 'add_recipe' %}" class="btn btn-info d-inline-block">Add Recipe</a>
+                <a href="{% url 'password_change' %}" class="btn btn-success d-inline-block">Change Password</a>
             </div>
         </div>
     </div>
@@ -252,7 +259,7 @@
                 const recipeId = event.target.dataset.recipeId;
                 const row = event.target.closest('tr');
                 const recipeTitle = row.querySelector('.name-cell a').innerText;
-                const isConfirmed = confirm(`Are you sure you want to delete this recipe (Title: ${recipeTitle})?`);
+                const isConfirmed = confirm(`Are you sure you want to delete this recipe (Recipe Title: ${recipeTitle})?`);
 
                 if (isConfirmed) {
                     const url = `/delete_recipe/?id=${recipeId}`;
@@ -291,7 +298,9 @@
                 // COMMENT
             } else if (event.target.classList.contains("delete-comment")) {
                 const commentId = event.target.dataset.commentId;
-                const isConfirmed = confirm(`Are you sure you want to delete this comment (id: ${commentId})?`);
+                const row = event.target.closest('tr');
+                const commentTitle = row.querySelector('.name-cell a').innerText;
+                const isConfirmed = confirm(`Are you sure you want to delete this comment (Recipe Title: ${commentTitle})?`);
 
                 if (isConfirmed) {
                     const url = `/delete_comment/?id=${commentId}`;
@@ -327,7 +336,7 @@
                             console.error('Error during fetch:', error);
                         });
                 }
-
+                //BOOKMARK
             } else if (event.target.classList.contains("delete-bookmark")) {
                 const bookmarkId = event.target.dataset.bookmarkId;
                 const isConfirmed = confirm(`Are you sure you want to delete this Bookmark (id: ${bookmarkId})?`);
@@ -349,6 +358,44 @@
                                     row.remove();
 
                                     // Refresh bookmarks after deletion
+                                    const currentTab = document.querySelector(".tab-link.active");
+                                    const currentTabName = currentTab ? currentTab.dataset.tab : 'default';
+
+                                    // Ensure the fetchData function is working as expected
+                                    fetchData(currentTabName);
+                                } else {
+                                    console.error('Error: Unable to find the row to delete.');
+                                }
+                            } else {
+                                console.error('Error: Server response indicates failure.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error during fetch:', error);
+                        });
+                }
+            } else if (event.target.classList.contains("delete-rating")) {
+                const ratingId = event.target.dataset.ratingId;
+                const recipeId = event.target.dataset.recipeId;
+                const isConfirmed = confirm(`Are you sure you want to delete this Rating (id: ${ratingId})?`);
+
+                if (isConfirmed) {
+                    const url = `/delete_rating/?id=${ratingId}&recipe_id=${recipeId}`;
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Remove the row from the table
+                                const row = event.target.closest("tr");
+                                if (row) {
+                                    row.remove();
+
+                                    // Refresh ratings after deletion
                                     const currentTab = document.querySelector(".tab-link.active");
                                     const currentTabName = currentTab ? currentTab.dataset.tab : 'default';
 

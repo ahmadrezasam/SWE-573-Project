@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Avg
 
 from .user_interaction import UserRating
 
@@ -20,17 +21,12 @@ class Recipe(models.Model):
 
     def calculate_avg_rating(self):
         ratings = UserRating.objects.filter(recipe=self)
-        total = 0
+        avg_rating = ratings.aggregate(Avg('value'))['value__avg']
 
-        if not ratings:
-            self.avg_rating = 0
+        if avg_rating is not None:
+            self.avg_rating = avg_rating
         else:
-            for rating in ratings:
-                total += rating.value
-                avg = total / ratings.count()
-                self.avg_rating = avg
-            else:
-                self.avg_rating = 0
+            self.avg_rating = 0
 
         self.save()
 

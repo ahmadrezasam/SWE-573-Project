@@ -1,0 +1,74 @@
+{% load static %}
+
+{% block content %}
+<style>
+    #add-recipe-form .btn-circle {
+        width: 45px;
+        height: 45px;
+        line-height: 45px;
+        text-align: center;
+        padding: 0;
+        border-radius: 50%;
+    }
+
+    #add-recipe-form .btn-circle i {
+        position: relative;
+        top: -1px;
+    }
+
+    #add-recipe-form .btn-circle-add {
+        width: fit-content;
+        height: 30px;
+        line-height: 30px;
+        font-size: 0.9rem;
+        border-radius: 1rem;
+    }
+
+    #add-recipe-form .btn-circle-sm {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 0.9rem;
+    }
+</style>
+
+<form method="post" id="add-recipe-form">
+    {% csrf_token %}
+    <div class="row my-2">
+        <!-- title starts -->
+        {% include './add-edit-recipe/title.html' with title=recipe_form.title.name %}
+        <!-- title ends -->
+
+        <!-- Recipe category -->
+        {% include './add-edit-recipe/category.html' with title=recipe.title %}
+        <!-- Recipe category end -->
+    </div>
+    <div class="mb-4">
+        <!-- Description start -->
+        {% include './add-edit-recipe/description.html' %}
+        <!-- Description end -->
+    </div>
+    <!-- Ingredients start -->
+    {% include './add-edit-recipe/ingredients.html' %}
+    <!-- Ingredients end -->
+
+    <!-- Instruction start -->
+    {% include './add-edit-recipe/instructions.html' %}
+    <!-- Instruction end -->
+
+    <div class="my-2 row col-md-12">
+        <!-- Time start -->
+        {% include './add-edit-recipe/time.html' %}
+        <!-- Time end -->
+
+        <!-- Upload Image part -->
+        {% include './add-edit-recipe/uploadimg.html' %}
+        <!-- Upload Image part end -->
+    </div>
+
+    <div class="text-center my-4">
+        <button type="submit" class="btn btn-primary w-25">Save</button>
+    </div>
+</form>
+
+{% endblock %}

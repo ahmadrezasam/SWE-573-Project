@@ -1,26 +1,36 @@
 from django.forms import ModelForm
 from django import forms
+from requests import get
 
 from recipe.models.user_profile import FoodAllergen
 from ..models import Recipe, Category, UserProfile, User, DietGoal, UserComment
+
+from django.contrib.auth.forms import  UserCreationForm
+
+class RegisterForm(UserCreationForm):
+    class Meta:
+        model=User
+        fields=['username', 'email', 'password1', 'password2']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('This email address is already in use. Please use a different email.')
+        return email
 
 class RecipeForm(ModelForm):
     class Meta:
         model = Recipe
         fields = '__all__'
-        exclude = ['ingredients', 'instructions', 'avg_rating', 'nutrition_facts', 'videos', 'images']
+        exclude = ['ingredients', 'instructions', 'avg_rating', 'nutrition_facts', 'videos', 'images', 'creator']
 
     category = forms.ModelMultipleChoiceField(
         queryset=Category.objects.all(),
         widget=forms.CheckboxSelectMultiple,
     )
-    
+        
     preparation_time = forms.CharField(widget=forms.TextInput(attrs={'type':'number', 'class': 'form-control d-inline', 'style':'width:6rem'}), required=False)
     cooking_time = forms.CharField(widget=forms.TextInput(attrs={'type':'number', 'class': 'form-control d-inline', 'style':'width:6rem'}), required=False)
-    
-    creator = forms.ModelChoiceField(queryset=User.objects.all(), empty_label="---------", required=True)
-
-
 # ------------------------------------------------------------
 
 class UserForm(ModelForm):
@@ -61,3 +71,4 @@ class UserCommentForm(ModelForm):
         model = UserComment
         fields = ['comment_text']
 
+#------------------------------------------------------------

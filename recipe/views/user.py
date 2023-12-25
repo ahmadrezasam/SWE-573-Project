@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from os.path import join
 
 from ..models import User, UserProfile, Recipe, UserComment, UserBookmark, UserRating
-from ..utils.forms import UserForm, UserProfileForm
+from ..utils.forms import RegisterForm, UserForm, UserProfileForm
 
 # Global variable
 profile_templates_path = 'components/profile/'
@@ -33,8 +38,6 @@ def handle_user_forms(request, user, user_profile):
 
     if request.method == 'POST':
         if user_form.is_valid() and user_profile_form.is_valid():
-            print(user_form)
-            print(user_profile_form)
             user_form.save()
             user_profile_form.save()
 
@@ -54,10 +57,13 @@ def get_tab_data(request):
     elif tab_name == 'ratings':
         data = render(request, join(profile_templates_path, 'ratings_table.html'), {'ratings': get_user_ratings(user_id)}).content
     
-    return JsonResponse({'table_html': data.decode('utf-8')})
+    return JsonResponse({'table_html': data.decode('utf-8')})  # type: ignore
 
-def profile(request, id):
-    user, user_profile = get_user_and_profile(request, id)
+# url: /profile/
+@login_required(login_url='login')
+def profile(request):
+    user = request.user
+    user, user_profile = get_user_and_profile(request, user.id)
     user_form, user_profile_form = handle_user_forms(request, user, user_profile)
 
     # selected_tab = request.GET.get('tab', 'recipes')
@@ -70,3 +76,60 @@ def profile(request, id):
     }
 
     return render(request, 'profile.html', context)
+
+def password_change(request):
+    password_form = PasswordChangeForm(request.user, request.POST)
+    if request.method == 'POST':
+        if password_form.is_valid():
+            user = password_form.save()
+            auth_login(request, user)
+            return redirect('profile')
+        
+    context = {'password_form': password_form}
+    return render(request, join(profile_templates_path, 'change-password.html'), context)
+           
+def register(request):
+    register_form = RegisterForm()
+    email_exists_warning = False  # Initialize the variable
+
+    if request.method == 'POST':
+        register_form = RegisterForm(request.POST)
+        if register_form.is_valid():
+            email = register_form.cleaned_data.get('email')
+            if User.objects.filter(email__iexact=email).exists():
+                email_exists_warning = True
+            else:
+                user = register_form.save(commit=False)
+                user.username = user.username.lower()
+                user.save()
+                # Check if UserProfile exists, create it if not
+                UserProfile.objects.get_or_create(user=user)
+
+                return redirect('login')
+
+    context = {'register_form': register_form, 'email_exists_warning': email_exists_warning}
+    return render(request, 'signup.html', context)
+
+def login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+            username = user.username
+        except User.DoesNotExist:
+            messages.error(request, 'User does not exist')
+            return redirect('login')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            auth_login(request, user)
+            return redirect('home')
+        
+    return render(request, 'signin.html')
+
+@login_required(login_url='login')
+def logoutUser(request):
+    logout(request)
+    return redirect('home')

@@ -1,0 +1,9 @@
+{% if not edit_mode %}
+<h4>{{ recipe.description.label_tag }}</h4>
+<textarea name="{{ recipe.description.name }}" class="form-control" id="description" cols="0"
+    rows="03"></textarea>
+{% else %}
+<h4>{{ recipe_form.description.label_tag }}</h4>
+<textarea name="{{ recipe_form.description.name }}" class="form-control" id="description" cols="0"
+    rows="03">{{ recipe_form.description.value }}</textarea>
+{% endif %}

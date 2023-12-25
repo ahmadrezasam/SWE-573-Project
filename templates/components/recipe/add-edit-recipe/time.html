@@ -1,0 +1,14 @@
+<div id="time" class="my-3 col-md-6">
+    <h4>Preparation & Cooking time</h4>
+    <div class="d-flex">
+        {% if not edit_mode %}
+        <div class="me-5">{{ recipe.preparation_time.label_tag }} {{ recipe.preparation_time }} <span>min</span></div>
+        <div> {{ recipe.cooking_time.label_tag }} {{ recipe.cooking_time }} <span>min</span></div>
+        {% else %}
+        <div class="me-5">{{ recipe_form.preparation_time.label_tag }} {{ recipe_form.preparation_time }}
+            <span>min</span>
+        </div>
+        <div> {{ recipe_form.cooking_time.label_tag }} {{ recipe_form.cooking_time }} <span>min</span></div>
+        {% endif %}
+    </div>
+</div>

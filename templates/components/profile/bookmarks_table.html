@@ -1,7 +1,7 @@
 {% load static %}
 <thead>
     <tr>
-        <th scope="col" class="id-cell">Bookmark ID</th>
+        <!-- <th scope="col" class="id-cell">Bookmark ID</th> -->
         <th scope="col">Recipe Title</th>
         <th scope="col">Recipe Description</th>
         <th scope="col"></th>
@@ -10,7 +10,7 @@
 <tbody>
     {% for bookmark in bookmarks %}
     <tr>
-        <th scope="row" class="id-cell">{{ bookmark.id }}</th>
+        <!-- <th scope="row" class="id-cell">{{ bookmark.id }}</th> -->
         <td class="name-cell text-decoration-none"> <a href="{% url 'recipe' bookmark.recipe.id %}">{{bookmark.recipe.title }}</a> </td>
         <td class="description-cell">{{ bookmark.recipe.description }}</td>
         <td style=" text-align: right;">

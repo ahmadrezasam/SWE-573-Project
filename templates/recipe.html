@@ -34,8 +34,37 @@
     #step {
         color: var(--tomato-cl);
     }
+
+    .card-body {
+        background-color: cornsilk;
+    }
+
+    #rating-stars .bi-star-fill {
+        cursor: pointer;
+    }
+
+    #rating-stars .bi-star-fill.filled,
+    .bi-star-fill.filled:hover {
+        content: '\F586';
+        color: #ffc107
+    }
 </style>
 <section>
+    {% if allergy_alert %}
+    <div class="alert alert-danger d-flex align-items-center my-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 2rem;"></i>
+        <div>
+            The recipe includes ingredients that you are allergic to.
+            <strong>(
+                {% for allergy in allergy_foods %}
+                {{ allergy }}
+                {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                )
+            </strong>
+        </div>
+    </div>
+    {% endif %}
     <div class="row mx-auto my-3 recipe-container">
         <main class="col-md-7 columns left">
             <div class="row ">
@@ -58,12 +87,16 @@
         <aside class="col-md-5 columns">
             {% include './components/carousel.html' %}
             <div class="d-flex justify-content-between">
-                <div>
-                    <img src="{% static 'icon/star.svg' %}" alt="Icon">
-                    <span class="recipe-rating">5</span>
+                <div id="rating-stars">
+                    <i class="bi bi-star-fill star" data-value="1"></i>
+                    <i class="bi bi-star-fill star" data-value="2"></i>
+                    <i class="bi bi-star-fill star" data-value="3"></i>
+                    <i class="bi bi-star-fill star" data-value="4"></i>
+                    <i class="bi bi-star-fill star" data-value="5"></i>
+                    <p id="avg-rating">Average Rating: {{ recipe.avg_rating|floatformat:2 }}</p>
                 </div>
                 <img id="bookmarkButton" data-bookmark-id="{{ recipe.id }}"
-                    src="{% if recipe.is_bookmarked %}{% static '/icon/heart-fill.svg' %}{% else %}{% static '/icon/heart-empty.svg' %}{% endif %}"
+                    src="{% if is_bookmarked %}{% static '/icon/heart-fill.svg' %}{% else %}{% static '/icon/heart-empty.svg' %}{% endif %}"
                     alt="Icon">
             </div>
 
@@ -104,9 +137,7 @@
     <main>
         <div class="row">
             <div class="col-md-12">
-                <h4 class="border-bottom pb-2">Nutrition Facts
-                    
-                </h4>
+                <h4 class="border-bottom pb-2">Nutrition Facts</h4>
                 <div class="my-2">
                     <div class="row">
                         {% for nutrient, value in recipe.nutrition_facts.items %}
@@ -122,7 +153,7 @@
 </section>
 
 
-<section class="mb-5">
+<section class=" row mb-5">
     <form method="post" action="">
         {% csrf_token %}
         <div class="mb-3">
@@ -130,32 +161,71 @@
             <textarea class="form-control" name="{{ comment_form.comment_text.name }}"></textarea>
             <div class="invalid-feedback">{{ comment_form.comment_text.errors }}</div>
         </div>
-        <button type="submit" class="float-end btn btn-warning">Add Comment</button>
+        <button type="submit" class="float-end btn btn-warning d-block">Add Comment</button>
     </form>
 
     <div>
         {% for comment in comments %}
-        <div>{{comment.user.username}}: {{ comment.comment_text }}</div>
+        <div class="d-flex flex-start mb-2 mt-5">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <div class="">
+                        <h5>{{comment.user.username}}:</h5>
+                        <p class="small">{{comment.created_at}}</p>
+                        <p>
+                            {{ comment.comment_text }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </section>
 
 <script>
+
+    const recipeId = '{{ recipe.id }}';
+    // Function to get the CSRF token from cookies
+    function getCSRFToken() {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                return decodeURIComponent(value);
+            }
+        }
+        return null;
+    }
+    // Get the CSRF token
+    const csrfToken = getCSRFToken();
+
+    const headers = new Headers({
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
+
         const bookmarkButton = document.getElementById('bookmarkButton');
-        const recipeId = '{{ recipe.id }}';
-        const url = `/bookmark_toggle/?id=${recipeId}`;
-        const baseStaticUrl = '/static/';
-
         bookmarkButton.addEventListener('click', function () {
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("data", data);
+            const url = `/bookmark_toggle/?id=${recipeId}`;
+            const baseStaticUrl = '/static/';
 
-                    // Update the bookmark button based on the server response
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                credentials: 'same-origin',
+                body: JSON.stringify({})
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/login/';
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     if (data.success) {
-                        // Toggle between the two SVG icons
                         if (data.is_bookmarked) {
                             bookmarkButton.src = baseStaticUrl + 'icon/heart-fill.svg';
                         } else {
@@ -169,7 +239,57 @@
                     console.error('Error:', error);
                 });
         });
+
+        // Handle star click events
+        document.querySelectorAll('#rating-stars .star').forEach(function (star) {
+            star.addEventListener('click', function () {
+                const ratingValue = this.getAttribute('data-value');
+                const url = `/rating/`;
+                // Send fetch request to submit rating
+                fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        'recipe_id': recipeId,
+                        'rating_value': ratingValue
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        // Update average rating on success
+                        document.getElementById('avg-rating').innerText = 'Average Rating: ' + data.avg_rating.toFixed(2);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            star.addEventListener('mouseenter', function () {
+                const value = parseInt(this.getAttribute('data-value'));
+                highlightStars(value);
+            });
+
+            star.addEventListener('mouseleave', function () {
+                clearStars();
+            });
+        });
+
+        function highlightStars(value) {
+            document.querySelectorAll('.star').forEach(function (star) {
+                const starValue = parseInt(star.getAttribute('data-value'));
+                star.classList.toggle('filled', starValue <= value);
+            });
+        }
+
+        function clearStars() {
+            document.querySelectorAll('.star').forEach(function (star) {
+                star.classList.remove('filled');
+            });
+        }
     });
+
 </script>
 
 {% endblock %}

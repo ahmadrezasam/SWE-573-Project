@@ -5,152 +5,15 @@
 {% endblock %}
 
 {% block content %}
-<style>
-    .btn-circle {
-        width: 45px;
-        height: 45px;
-        line-height: 45px;
-        text-align: center;
-        padding: 0;
-        border-radius: 50%;
-    }
+<div class="my-4">
+    <a class="text-decoration-none" href="{% url 'profile' %}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go
+        back to profile</a>
+    <h2 class="text-center">Add Recipe</h2>
+</div>
 
-    .btn-circle i {
-        position: relative;
-        top: -1px;
-    }
-
-    .btn-circle-add {
-        width: fit-content;
-        height: 30px;
-        line-height: 30px;
-        font-size: 0.9rem;
-        border-radius: 1rem;
-    }
-
-    .btn-circle-sm {
-        width: 30px;
-        height: 30px;
-        line-height: 30px;
-        font-size: 0.9rem;
-    }
-</style>
-<h2>Add Recipe</h2>
-<form method="post">
-    {% csrf_token %}
-    <!-- {{ recipe.as_p }} -->
-    <table>
-        {{ recipe.creator }}
-    </table>
-    <!-- Recipe title -->
-    <div class="row my-2">
-        <div class="my-3 col-md-6 columns">
-            <h4>{{ recipe.title.label_tag }}</h4>
-            <input type="text" class="form-control" id="title" name="{{ recipe.title.name }}">
-        </div>
-        <!-- Recipe category -->
-        <div class="my-3 col-md-6 ">
-            <h4>Category:</h4>
-            <div class="d-flex">
-                {{ recipe.category }}
-            </div>
-        </div>
-    </div>
-    <div class="mb-4">
-        <h4>{{ recipe.description.label_tag }}</h4>
-        <textarea name="{{ recipe.description.name }}" class="form-control" id="description" cols="0"
-            rows="03"></textarea>
-    </div>
-
-    <!-- Ingredients start -->
-    <div class="row my-2">
-        <div class="d-flex justify-content-between">
-            <h4>Ingredients</h4>
-            <button type="button" class="btn btn-info btn-circle btn-circle-add m-1 add-ingredient px-2">Add
-                Ingredient<i class="bi bi-plus-lg add-ingredient ps-1"></i></button>
-        </div>
-        <div id="ingredients" class="my-3 col-md-12 row">
-            <div class="ingredient row mb-4" data-ingredient-id="0">
-
-                <div class="col-md-1">
-                    <label for="id_ingredients-0-amount" class="form-label">Amount:</label>
-                    <input type="text" name="amounts" id="id_ingredients-0-amount" class="form-control">
-                </div>
-
-                <div class="col-md-1">
-                    <label for="id_ingredients-0-unit" class="form-label">Unit:</label>
-                    <select class="form-select" id="id_ingredients-0-unit" name="amountUnits">
-                        <option value="gr">gr</option>
-                        <option value="kg">kg</option>
-                        <option value="spoon">Spoon</option>
-                    </select>
-                </div>
-
-                <div class="col-md-9">
-                    <label for="id_ingredients-0-name" class="form-label">Ingredient:</label>
-                    <input type="text" name="ingredients" id="id_ingredients-0-name" class="form-control"
-                        value="{{ ingredient.name }}">
-                </div>
-
-                <button type="button"
-                    class="btn btn-warning btn-circle btn-circle-sm m-1 remove-ingredient col-md-1 align-self-end"
-                    onclick="removeIngredientField(this)">
-                    <i class="bi bi-dash remove-ingredient"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- Ingredients end -->
-
-    <!-- Instuctions start -->
-    <div class="my-2">
-        <div class="d-flex justify-content-between">
-            <h4>Steps</h4>
-            <button type="button" class="btn btn-info btn-circle btn-circle-add m-1 px-2 add-step">Add step<i
-                    class="bi bi-plus-lg add-step ps-1"></i></button>
-        </div>
-        <div id="steps" class="row">
-            <div class="step col-md-12 my-2" data-step-id="1">
-                <div class="row">
-                    <div class="col-auto align-self-center pe-0">
-                        <label for="{{ step.id_for_label }}">Step 1:</label>
-                    </div>
-                    <div class="col-md-10">
-                        <input type="text" name="instructions" id="id_instructions_${newStepId}" class="form-control">
-                    </div>
-                    <div class="col-auto ps-0">
-                        <button type="button"
-                            class="btn btn-warning btn-circle btn-circle-sm m-1 remove-step align-self-center">
-                            <i class="bi bi-dash remove-step"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Instuctions end -->
-
-    <div class="my-2 row col-md-12">
-        <div id="time" class="my-3 col-md-6">
-            <h4>Preparation & Cooking time</h4>
-            <div class="d-flex">
-                <div class="me-5">{{ recipe.preparation_time.label_tag }} {{ recipe.preparation_time }} <span>min</span></div>
-                <div> {{ recipe.cooking_time.label_tag }} {{ recipe.cooking_time }} <span>min</span></div>
-            </div>
-        </div>
-
-        <div class="my-3 col-md-6">
-            <h4>Upload Recipe Image</h4>
-            <input class="form-control" type="file" name="{{ recipe.images.name }}" id="formFile">
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
-
+{% include './components/recipe/add-edit-recipe.html' %}
 <!-- instructions js -->
 <script src="{% static 'js/recipe_instructions.js' %}"></script>
 <!-- ingredients js -->
 <script src="{% static 'js/recipe_ingredients.js' %}"></script>
-
 {% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'main.html' %}
+{% block navbar %}
+<!-- Empty block, it overrides the navbar and removes it from the page -->
+{% endblock %}
+<!-- {% load static %} -->
+{% block content %}
+
+<style>
+    #signup .form-label {
+        margin-left: 7%;
+    }
+
+    #password1 ul,
+    ol {
+        padding-left: 0%;
+    }
+
+    #signup .help-text {
+        margin-left: 2.7rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+
+<section class="vh-100" id="signup">
+    <div class="container h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-8 col-xl-8">
+                <div class="card text-black" style="border-radius: 25px;">
+                    <div class="card-body p-md-5">
+                        <div class="row justify-content-center">
+                            <div class="col-md-12 col-lg-6 col-xl-11 order-2 order-lg-7">
+
+                                <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
+
+                                <form method="POST" class="mx-1 mx-md-4">
+                                    {% csrf_token %}
+                                    <label class="form-label" for="email">{{ register_form.email.label_tag }}</label>
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input type="email" id="email" class="form-control"
+                                                name="{{ register_form.email.name }}" />
+                                        </div>
+                                    </div>
+                                    {% if email_exists_warning %}
+                                    <p style="color: red;">A user with this email address already exists. Please
+                                        choose a different email.</p>
+                                    {% endif %}
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="username">
+                                            {{register_form.username.label_tag}}</label>
+                                        <div class="d-flex flex-row align-items-center">
+                                            <i class="fas fa-id-card fa-lg me-3 fa-fw "></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="text" id="username" class="form-control"
+                                                    name="{{ register_form.username.name }}" />
+                                            </div>
+                                        </div>
+                                        <div class="help-text">{{ register_form.username.help_text }}</div>
+                                    </div>
+
+                                    <label class="form-label" for="password1">
+                                        {{ register_form.password1.label_tag}}</label>
+                                    <div class="mb-4">
+                                        <div class="d-flex flex-row align-items-center">
+                                            <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="password" id="password1" class="form-control"
+                                                    name="{{ register_form.password1.name }}" />
+                                            </div>
+
+                                        </div>
+                                        <div class="help-text" id="password1">{{ register_form.password1.help_text }}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="password2">
+                                            {{ register_form.password2.label_tag}}</label>
+                                        <div class="d-flex flex-row align-items-center ">
+                                            <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="password" id="password2" class="form-control"
+                                                    name="{{ register_form.password2.name }}" />
+                                            </div>
+                                        </div>
+                                        <div class="help-text" id="password2">{{ register_form.password2.help_text }}
+                                        </div>
+                                    </div>
+                                    <!-- <div class="form-check d-flex justify-content-center mb-5">
+                                        <input class="form-check-input me-2" type="checkbox" value=""
+                                            id="form2Example3c" />
+                                        <label class="form-check-label" for="form2Example3">
+                                            I agree all statements in <a href="#!">Terms of service</a>
+                                        </label>
+                                    </div> -->
+
+                                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                        <input type="submit" class="btn btn-primary btn-lg" value="Register">
+                                    </div>
+
+                                </form>
+                                <p> Already have an account <a href="{% url 'login' %}">signin</a></p>
+                                {{register_form.errors}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

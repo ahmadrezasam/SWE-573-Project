@@ -1,0 +1,91 @@
+{% load custom_filters %}
+
+<!-- Ingredients start -->
+<div class="row my-2">
+    <div class="d-flex justify-content-between">
+        <h4>Ingredients</h4>
+        <button type="button" class="btn btn-info btn-circle btn-circle-add m-1 add-ingredient px-2">Add
+            Ingredient<i class="bi bi-plus-lg add-ingredient ps-1"></i></button>
+    </div>
+    <div id="ingredients" class="my-3 col-md-12 row">
+        {% if not edit_mode %}
+        <div class="ingredient row mb-4" data-ingredient-id="0">
+
+            <div class="col-md-1">
+                <label for="id_ingredients-0-amount" class="form-label">Amount:</label>
+                <input type="text" name="amounts" id="id_ingredients-0-amount" class="form-control">
+            </div>
+
+            <div class="col-md-1">
+                <label for="id_ingredients-0-unit" class="form-label">Unit:</label>
+                <select class="form-select" id="id_ingredients-0-unit" name="amountUnits">
+                    <option value="num">num</option>
+                    <option value="gr">gr</option>
+                    <option value="kg">kg</option>
+                    <option value="mL">milliliter</option>
+                    <option value="l">liter</option>
+                    <option value="tbsp">tablespoon</option>
+                    <option value="tsp">teaspoon</option>
+                    <option value="oz">ounce</option>
+                    <option value="fl. oz">fluid ounce</option>
+                    <option value="lb">pound</option>
+                </select>
+            </div>
+
+            <div class="col-md-9">
+                <label for="id_ingredients-0-name" class="form-label">Ingredient:</label>
+                <input type="text" name="ingredients" id="id_ingredients-0-name" class="form-control"
+                    value="{{ ingredient.name }}">
+            </div>
+
+            <button type="button"
+                class="btn btn-warning btn-circle btn-circle-sm m-1 remove-ingredient col-md-1 align-self-end"
+                onclick="removeIngredientField(this)">
+                <i class="bi bi-dash remove-ingredient"></i>
+            </button>
+        </div>
+        {% else %}
+        {% for ingredient_name, ingredient_amount in existing_ingredients.items %}
+        {% with ingredient_parts=ingredient_amount|split_amount %}
+        <div class="ingredient row mb-4" data-ingredient-id="{{ forloop.counter0 }}">
+
+            <div class="col-md-1">
+                <label for="id_ingredients-{{ forloop.counter0 }}-amount" class="form-label">Amount:</label>
+                <input type="text" name="amounts" id="id_ingredients-{{ forloop.counter0 }}-amount" class="form-control"
+                    value="{{ ingredient_parts.0 }}">
+            </div>
+
+            <div class="col-md-1">
+                <label for="id_ingredients-{{ forloop.counter0 }}-unit" class="form-label">Unit:</label>
+                <select class="form-select" id="id_ingredients-{{ forloop.counter0 }}-unit" name="amountUnits">
+                    <option value="num" {% if ingredient_parts.1 == 'num' %}selected{% endif %}>num</option>
+                    <option value="gr" {% if ingredient_parts.1 == 'gr' %}selected{% endif %}>gr</option>
+                    <option value="kg" {% if ingredient_parts.1 == 'kg' %}selected{% endif %}>kg</option>
+                    <option value="mL" {% if ingredient_parts.1 == 'mL' %}selected{% endif %}>milliliter</option>
+                    <option value="l" {% if ingredient_parts.1 == 'l' %}selected{% endif %}>liter</option>
+                    <option value="tbsp" {% if ingredient_parts.1 == 'tbsp' %}selected{% endif %}>tablespoon</option>
+                    <option value="tsp" {% if ingredient_parts.1 == 'tsp' %}selected{% endif %}>teaspoon</option>
+                    <option value="oz" {% if ingredient_parts.1 == 'oz' %}selected{% endif %}>ounce</option>
+                    <option value="fl. oz" {% if ingredient_parts.1 == 'fl. oz' %}selected{% endif %}>fluid ounce</option>
+                    <option value="lb" {% if ingredient_parts.1 == 'lb' %}selected{% endif %}>pound</option>
+                </select>
+            </div>
+
+            <div class="col-md-9">
+                <label for="id_ingredients-{{ forloop.counter0 }}-name" class="form-label">Ingredient:</label>
+                <input type="text" name="ingredients" id="id_ingredients-{{ forloop.counter0 }}-name"
+                    class="form-control" value="{{ ingredient_name }}">
+            </div>
+
+            <button type="button"
+                class="btn btn-warning btn-circle btn-circle-sm m-1 remove-ingredient col-md-1 align-self-end"
+                onclick="removeIngredientField(this)">
+                <i class="bi bi-dash remove-ingredient"></i>
+            </button>
+        </div>
+        {% endwith %}
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+<!-- Ingredients end -->

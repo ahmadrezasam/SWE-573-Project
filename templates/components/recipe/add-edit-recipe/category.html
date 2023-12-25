@@ -1,0 +1,10 @@
+<div class="my-3 col-md-6 ">
+    <h4>Category:</h4>
+    <div class="d-flex">
+        {% if not edit_mode %}
+        {{ recipe.category }}
+        {% else %}
+        {{ recipe_form.category }}
+        {% endif %}
+    </div>
+</div>

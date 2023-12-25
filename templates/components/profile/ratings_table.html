@@ -1,0 +1,23 @@
+<thead>
+    <tr>
+        <!-- <th scope="col" class="id-cell">Comment ID</th> -->
+        <th scope="col">Recipe Title</th>
+        <th scope="col">Recipe Description</th>
+        <th scope="col">Recipe Rate</th>
+        <th scope="col"></th>
+    </tr>
+</thead>
+<tbody>
+    {% for rating in ratings %}
+    <tr>
+        <!-- <th scope="row" class="id-cell">{{ comment.id }}</th> -->
+        <td class="name-cell"><a href="{% url 'recipe' rating.recipe.id %}">{{ rating.recipe.title }}</a></td>
+        <td class="description-cell">{{ rating.recipe.description }}</td>
+        <td class="description-cell">{{ rating.value }}</td>
+        <td style=" text-align: right;">
+            <a href="{% url 'recipe' rating.recipe.id %}" class="btn btn-outline-info me-3">Edit</a>
+            <button class="btn btn-outline-danger delete-rating" data-rating-id="{{ rating.id }}" data-recipe-id="{{ rating.recipe.id }}">Delete</button>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>

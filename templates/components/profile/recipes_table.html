@@ -1,6 +1,6 @@
 <thead>
     <tr>
-        <th scope="col" class="id-cell">Recipe ID</th>
+        <!-- <th scope="col" class="id-cell">Recipe ID</th> -->
         <th scope="col">Recipe Name</th>
         <th scope="col">Recipe Description</th>
         <th scope="col"></th>
@@ -9,7 +9,7 @@
 <tbody>
     {% for recipe in recipes %}
     <tr>
-        <th scope="row" class="id-cell">{{ recipe.id }}</th>
+        <!-- <th scope="row" class="id-cell">{{ recipe.id }}</th> -->
         <td class="name-cell"><a href="{% url 'recipe' recipe.id %}">{{ recipe.title }}</a></td>
         <td class="description-cell">{{ recipe.description }}</td>
         <td style=" text-align: right;">

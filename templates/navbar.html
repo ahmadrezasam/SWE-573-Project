@@ -24,8 +24,19 @@
       </li>
     </ul>
   </div>
+  {% if request.user.is_authenticated %}
+  <!-- Logged In -->
   <div class="class= d-flex">
-    <a class="btn btn-primary register" href="#">Register</a>
-    <a class="btn btn-secondary login" href="#" style="margin-left: 1rem;">Login</a>
+    <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+    <a class="btn btn-secondary" href="{% url 'profile' %}" style="margin-left: 1rem;">Profile</a>
   </div>
+  {% else %}
+  <!-- Not Logged In -->
+  <div class="class= d-flex">
+    <a class="btn btn-primary register" href="{url ''}">Register</a>
+    <a class="btn btn-secondary login" href="{% url 'login' %}" style="margin-left: 1rem;">Login</a>
+  </div>
+  {% endif %}
+
+
 </nav>
