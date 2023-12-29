@@ -1,4 +1,8 @@
 <div class="my-3 col-md-6">
     <h4>Upload Recipe Image</h4>
+    {% if not edit_mode %}
     <input class="form-control" type="file" name="{{ recipe.images.name }}" id="formFile">
+    {% else %}
+    <input class="form-control" type="file" name="{{ recipe_form.images.name }}" id="formFile">
+    {% endif %}
 </div>

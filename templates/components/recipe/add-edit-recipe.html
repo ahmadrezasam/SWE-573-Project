@@ -32,7 +32,7 @@
     }
 </style>
 
-<form method="post" id="add-recipe-form">
+<form method="post" id="add-recipe-form"  enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row my-2">
         <!-- title starts -->
@@ -62,7 +62,7 @@
         <!-- Time end -->
 
         <!-- Upload Image part -->
-        {% include './add-edit-recipe/uploadimg.html' %}
+        {% include './add-edit-recipe/uploading.html' %}
         <!-- Upload Image part end -->
     </div>
 

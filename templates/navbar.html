@@ -11,7 +11,7 @@
   <div class="navbar-collapse justify-content-center">
     <ul class="navbar-nav mr-auto"> 
       <li class="nav-item">
-        <a class="nav-link" href="#">Home Page</a>
+        <a class="nav-link" href="{% url 'home' %}">Home Page</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">Recipe Page</a>
@@ -33,7 +33,7 @@
   {% else %}
   <!-- Not Logged In -->
   <div class="class= d-flex">
-    <a class="btn btn-primary register" href="{url ''}">Register</a>
+    <a class="btn btn-primary register" href="{% url 'register' %}">Register</a>
     <a class="btn btn-secondary login" href="{% url 'login' %}" style="margin-left: 1rem;">Login</a>
   </div>
   {% endif %}

@@ -3,7 +3,12 @@
 <a href="{% url 'recipe' recipe.id %}" class="text-decoration-none">
     <div class="col">
         <div class="card custom-card">
+            {% if recipe.images %}
+            <img src="{{ recipe.images.url }}" class="card-img-top" alt="{{ recipe.title }}">
+            {% else %}
             <img src="{% static 'img/ex1.jpg' %}" class="card-img-top" alt="...">
+            {% endif %}
+            <!-- <img src="{% static 'img/ex1.jpg' %}" class="card-img-top" alt="..."> -->
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between">
                     <h5 class="card-title ellipsis" style="max-width: 75%; flex-shrink: 0;">{{recipe.title}}</h5>

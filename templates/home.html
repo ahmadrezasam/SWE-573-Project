@@ -7,14 +7,21 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
+    #search small {
+        color: #6c757d;
+    }
 </style>
 
-<h2 class="mt-2">Search a recipe:</h2>
-<form id="search-form" class="form-inline d-flex gap-4" action="{% url 'home' %}" method="get">
-    <input id="search-input" name="q" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-success my-5 my-sm-0" type="submit">Search</button>
-</form>
-
+<section id="search">
+    <h2 class="mt-2">Search a recipe:</h2>
+    <form id="search-form" class="form-inline d-flex gap-4" action="{% url 'home' %}" method="get">
+        <input id="search-input" name="q" class="form-control mr-sm-2" type="search" placeholder="Search"
+            aria-label="Search">
+        <button class="btn btn-outline-success my-5 my-sm-0" type="submit">Search</button>
+    </form>
+    <small>Separate ingredients by comma</small>
+</section>
 <div class="row row-cols-1 row-cols-md-3 g-4 my-3" id="search-results-container">
     {% include './components/home/recipe_cards.html'%}
     <footer>
@@ -23,37 +30,37 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchForm = document.getElementById('search-form');
-    const searchInput = document.getElementById('search-input');
-    const searchResultsContainer = document.getElementById('search-results-container');
-    const originalRecipesContainer = document.getElementById('original-recipes-container');
-    const url = `/search/`;
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const searchResultsContainer = document.getElementById('search-results-container');
+        const originalRecipesContainer = document.getElementById('original-recipes-container');
+        const url = `/search/`;
 
-    searchForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        performSearch();
-        console.log('search performed', searchInput.value)
-    });
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            performSearch();
+            console.log('search performed', searchInput.value)
+        });
 
-    function performSearch() {
-        const searchUrl = `${url}?q=${searchInput.value}`;
-        fetch(searchUrl)
-            .then(response => response.text())
-            .then(data => {
-                searchResultsContainer.innerHTML = data;
-                originalRecipesContainer.style.display = 'none';
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    searchInput.addEventListener('input', function () {
-        if (searchInput.value === '') {
-            searchResultsContainer.innerHTML = '';
-            originalRecipesContainer.style.display = 'block';
+        function performSearch() {
+            const searchUrl = `${url}?q=${searchInput.value}`;
+            fetch(searchUrl)
+                .then(response => response.text())
+                .then(data => {
+                    searchResultsContainer.innerHTML = data;
+                    originalRecipesContainer.style.display = 'none';
+                })
+                .catch(error => console.error('Error:', error));
         }
+
+        searchInput.addEventListener('input', function () {
+            if (searchInput.value === '') {
+                searchResultsContainer.innerHTML = '';
+                originalRecipesContainer.style.display = 'block';
+            }
+        });
     });
-});
 
 </script>
 {% endblock content %}

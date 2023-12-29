@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db import transaction
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import random, json
@@ -30,9 +31,22 @@ def handle_comment_post(request, recipe_id):
 
 def search(request):
     query = request.GET.get('q', '')
-    print("query", query)
-    recipes = Recipe.objects.filter(title__icontains=query)
+    print("queryyyyyyyyyyyyyyyyyyyyyyyyyyyyy", query)
 
+    # Split the input query into a list of ingredients
+    ingredients_list = [ingredient.strip() for ingredient in query.split(',')]
+    # Create a Q object to combine queries for title and ingredients
+    title_query = Q(title__icontains=query)
+    ingredients_query = Q(ingredients__has_key=ingredients_list[0])
+
+    for ingredient in ingredients_list:
+            # Create a condition for each ingredient using the JSONField syntax
+            condition = Q(ingredients__has_key=ingredient)
+            ingredients_query &= condition
+
+    # Combine the title and ingredients queries
+    recipes = Recipe.objects.filter(title_query | ingredients_query)
+    print("recipes", recipes)
     context = {'recipes': recipes, 'query': query}
     return render(request, 'components/home/search_result.html', context)
 
@@ -86,7 +100,7 @@ def recipe(request, id):
 
 @login_required(login_url='login')
 def add_recipe(request):
-    recipe_form = RecipeForm(request.POST)
+    recipe_form = RecipeForm(request.POST, request.FILES)
 
     amounts = request.POST.getlist('amounts')  
     amount_units = request.POST.getlist('amountUnits')  
@@ -124,11 +138,12 @@ def edit_recipe(request, recipe_id):
     
     edit_mode = True
     recipe_form = RecipeForm(instance=recipe)
+    print(recipe_form)
     existing_instructions = recipe.instructions
     existing_ingredients = recipe.ingredients
 
     if request.method == 'POST':
-        recipe_form = RecipeForm(request.POST, instance=recipe)
+        recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
         if recipe_form.is_valid():
             with transaction.atomic():
                 new_recipe = recipe_form.save(commit=False) 

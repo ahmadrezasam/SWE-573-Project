@@ -22,8 +22,9 @@ class RecipeForm(ModelForm):
     class Meta:
         model = Recipe
         fields = '__all__'
-        exclude = ['ingredients', 'instructions', 'avg_rating', 'nutrition_facts', 'videos', 'images', 'creator']
-
+        exclude = ['ingredients', 'instructions', 'avg_rating', 'nutrition_facts', 'videos', 'creator']
+        widgets = {'images': forms.ClearableFileInput(attrs={'class': 'form-control'})}
+    
     category = forms.ModelMultipleChoiceField(
         queryset=Category.objects.all(),
         widget=forms.CheckboxSelectMultiple,
