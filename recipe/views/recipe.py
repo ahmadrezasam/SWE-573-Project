@@ -31,7 +31,6 @@ def handle_comment_post(request, recipe_id):
 
 def search(request):
     query = request.GET.get('q', '')
-    print("queryyyyyyyyyyyyyyyyyyyyyyyyyyyyy", query)
 
     # Split the input query into a list of ingredients
     ingredients_list = [ingredient.strip() for ingredient in query.split(',')]
@@ -46,7 +45,6 @@ def search(request):
 
     # Combine the title and ingredients queries
     recipes = Recipe.objects.filter(title_query | ingredients_query)
-    print("recipes", recipes)
     context = {'recipes': recipes, 'query': query}
     return render(request, 'components/home/search_result.html', context)
 
@@ -68,7 +66,6 @@ def recipe(request, id):
         recipe_ingredients = set(recipe.ingredients.keys())
         
         allergy_foods = allergic_ingredients.intersection(recipe_ingredients)
-        print(allergy_foods)
         
         # Use boolean values directly
         allergy_alert = bool(allergy_foods)
@@ -80,9 +77,7 @@ def recipe(request, id):
 
     comments = get_comments_for_recipe(recipe)
     comment_form = UserCommentForm()
-    print(request.user.id)
     is_bookmarked = UserBookmark.objects.filter(user=request.user.id, recipe=recipe).exists()
-    print(is_bookmarked)
 
     if request.method == 'POST':
         handle_comment_post(request, id)
@@ -138,7 +133,6 @@ def edit_recipe(request, recipe_id):
     
     edit_mode = True
     recipe_form = RecipeForm(instance=recipe)
-    print(recipe_form)
     existing_instructions = recipe.instructions
     existing_ingredients = recipe.ingredients
 

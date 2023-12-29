@@ -1,29 +1,28 @@
-# pull official base image
-FROM python:3.8
 
-# set work directory
-WORKDIR /src/app
+FROM python:3.9.2-slim-buster
 
-# set environment variables
-ENV PYTHONUNBUFFERED 1
+WORKDIR /app
+
+LABEL maintainer="recipeApp.com"
+
 ENV PYTHONDONTWRITEBYTECODE 1
 
-# install dependencies
-COPY requirements.txt .
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update \
+    && apt-get -y install netcat gcc postgresql \
+    && apt-get clean
+
+RUN apt-get update && apt-get install -y gdal-bin
+# RUN apt-get update \
+#     && apt-get install -y binutils libproj-dev gdal-bin
+
+RUN pip install --upgrade pip
+
+COPY ./requirements.txt /app/requirements.txt
+
 RUN pip install -r requirements.txt
-RUN pip install --upgrade gevent 
 
-# copy project
-COPY . .
+COPY . /app
 
-# Copy the docker-entrypoint.sh script to the /src/app directory
-COPY docker-entrypoint.sh /src/app/
-
-# Set execute permission for the script
-RUN chmod +x /src/app/docker-entrypoint.sh
-
-# Define environment variable
-ENV NAME venv
-
-# CMD ["python","manage.py", "runserver"]
-CMD [ "./docker-entrypoint.sh" ]
+CMD python manage.py migrate && python manage.py runserver 0.0.0.0:8000
