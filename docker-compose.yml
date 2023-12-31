@@ -1,40 +1,34 @@
-version: '3.7'
+version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  my-postgres:
+    image: postgres:15
+    container_name: db
+    environment:
+     - POSTGRES_DB=${DATABASE_NAME}
+     - POSTGRES_USER=${DATABASE_USER}
+     - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     ports:
-      - "8000:8000"
+    - '5432:5432'
+    volumes:
+    - pg_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: django
+    ports:
+      - '8000:8000'
     volumes:
       - .:/app
-    env_file:
-      - .env
-    restart: "on-failure"
+    environment:
+      - DJANGO_ENV=${DJANGO_ENV}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
     depends_on:
-      - postgres-db
-    networks:
-      - recipeApp
-
-  postgres-db:
-    image: postgres:12.1-alpine
-    ports: 
-      - "5432:5432"
-    volumes: 
-      - postgres_data:/var/lib/postgresql/data
-    environment: 
-      - POSTGRES_HOST_AUTH_METHOD=trust
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=1
-      - POSTGRES_DB=recipe
-    restart: "on-failure"
-    networks: 
-      - recipeApp
-
-networks:
-  recipeApp:
-    driver: bridge
+      - my-postgres
 
 volumes:
-  postgres_data:
+  pg_data:

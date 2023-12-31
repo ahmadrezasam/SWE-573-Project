@@ -14,6 +14,18 @@ from pathlib import Path
 
 from decouple import config
 
+import environ
+
+env = environ.Env(DEBUG=(bool,False))
+environ.Env.read_env(env_file=".env")
+
+DB_NAME = config('DATABASE_NAME')
+DB_USER = config('DATABASE_USER')
+DB_PASSWORD = config('DATABASE_PASSWORD')
+DB_HOST = config('DATABASE_HOST')
+DB_PORT = config('DATABASE_PORT')
+DB_SSLMODE = config('DATABASE_SSLMODE')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,14 +34,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cf38@^%hvw$^q#@$=!8@4-z%!+^0)r@)2qtz1@a$0_uxm2s@qz'
+SECRET_KEY = config('SECRET_KEY')
 
-FDC_API_KEY = config('FDC_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True # Disable in production
+ALLOWED_HOSTS = [] # Disable in production
+#Deployment settings
+# DEBUG = config('DEBUG') # False
+# ALLOWED_HOSTS = ['shark-app-iq8vp.ondigitalocean.app']
+# CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_DOMAIN = '*.ondigitalocean.app'
+# CSRF_TRUSTED_ORIGINS = ['https://*.ondigitalocean.app','https://*.127.0.0.1']
 
-ALLOWED_HOSTS = []
-
+# Food Data Central API Key
+FDC_API_KEY = config('FDC_API_KEY')
 
 # Application definition
 
@@ -86,17 +104,30 @@ WSGI_APPLICATION = 'recipeApp.wsgi.application'
 #     }
 # }
 
+# Local database settings using PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'recipe',
         'USER': 'postgres',
         'PASSWORD': '1',
-        # 'HOST': 'localhost',
-        'HOST': 'postgres-db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
+
+# Deployment database settings using PostgreSQL
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': DB_NAME,
+#         'USER': DB_USER,
+#         'PASSWORD': DB_PASSWORD,
+#         'HOST': DB_HOST,
+#         'PORT': DB_PORT,
+#         'sslmode': DB_SSLMODE,
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -138,6 +169,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 
+# Media files (user uploaded files)
 MEDIA_ROOT = BASE_DIR/ 'media'
 MEDIA_URL = '/media/'
 
