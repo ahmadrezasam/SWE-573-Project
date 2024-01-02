@@ -1,5 +1,7 @@
 env
 # .env
+*.sql
 .venv
+# media
 .gitignore
 .vscode

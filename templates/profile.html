@@ -122,15 +122,18 @@
                     <label class="align-self-center me-2" for="{{ user_profile_form.height.id_for_label }}"
                         class="form-label">Height:</label>
                     <input type="number" class="form-control" id="{{ user_profile_form.height.id_for_label }}"
-                        name="{{ user_profile_form.height.name }}" value="{{ user_profile_form.height.value }}"><small>cm</small>
+                        name="{{ user_profile_form.height.name }}" value="{{ user_profile_form.height.value }}"><small class="align-self-center ms-1">cm</small>
                     <div class="invalid-feedback">{{ user_profile_form.height.errors }}</div>
                 </div>
                 <div class="d-flex">
                     <label class="align-self-center me-2" for="{{ user_profile_form.weight.id_for_label }}"
                         class="form-label">Weight:</label>
                     <input type="number" class="form-control" name="{{ user_profile_form.weight.name }}"
-                        value="{{ user_profile_form.weight.value }}" id="{{ user_profile_form.weight.id_for_label }}"> <small>kg</small>
+                        value="{{ user_profile_form.weight.value }}" id="{{ user_profile_form.weight.id_for_label }}"> <small class="align-self-center ms-1">kg</small>
                     <div class="invalid-feedback">{{ user_profile_form.weight.errors }}</div>
+                </div>
+                <div class="d-flex ms-4 align-self-center">
+                    <div class="">BMI: {{ bmi|floatformat:2 }}</div>
                 </div>
             </div>
 

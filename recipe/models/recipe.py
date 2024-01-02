@@ -4,6 +4,13 @@ from django.db.models import Avg
 
 from .user_interaction import UserRating
 
+import uuid
+
+def image_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return f'images/{filename}'
+
 class Recipe(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -11,7 +18,7 @@ class Recipe(models.Model):
     description = models.TextField()
     ingredients = models.JSONField() # Dictionary { Ingredient : Amount}
     instructions = models.JSONField() # List [step1, step2, step3, ...]
-    images = models.ImageField(null=True, blank=True, upload_to='images/')
+    images = models.ImageField(null=True, blank=True, upload_to=image_file_path)
     videos = models.URLField(null=True, blank=True)
     nutrition_facts = models.JSONField(null=True, blank=True) #Dictionary {Nutrition(ex.protein) : Amount}
     preparation_time = models.PositiveIntegerField(null=True, blank=True)  # Time in minutes
@@ -29,6 +36,7 @@ class Recipe(models.Model):
             self.avg_rating = 0
 
         self.save()
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

@@ -8,6 +8,8 @@ from django.contrib import messages
 
 from os.path import join
 
+from recipe.utils.utils import calculate_bmi
+
 from ..models import User, UserProfile, Recipe, UserComment, UserBookmark, UserRating
 from ..utils.forms import RegisterForm, UserForm, UserProfileForm
 
@@ -65,12 +67,13 @@ def profile(request):
     user = request.user
     user, user_profile = get_user_and_profile(request, user.id)
     user_form, user_profile_form = handle_user_forms(request, user, user_profile)
-
+    bmi = calculate_bmi(user_profile.weight, user_profile.height)
     # selected_tab = request.GET.get('tab', 'recipes')
 
     context = {
         'user': user,
         'user_profile': user_profile,
+        'bmi': bmi,
         'user_form': user_form,
         'user_profile_form': user_profile_form,
     }

@@ -37,14 +37,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True # Disable in production
-ALLOWED_HOSTS = [] # Disable in production
+# DEBUG = True # Disable in production
+# ALLOWED_HOSTS = [] # Disable in production
+
 #Deployment settings
-# DEBUG = config('DEBUG') # False
-# ALLOWED_HOSTS = ['shark-app-iq8vp.ondigitalocean.app']
-# CSRF_COOKIE_SECURE = True
-# CSRF_COOKIE_DOMAIN = '*.ondigitalocean.app'
-# CSRF_TRUSTED_ORIGINS = ['https://*.ondigitalocean.app','https://*.127.0.0.1']
+DEBUG = config('DEBUG') # False
+ALLOWED_HOSTS = ['shark-app-iq8vp.ondigitalocean.app']
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_DOMAIN = 'shark-app-iq8vp.ondigitalocean.app'
+CSRF_TRUSTED_ORIGINS = ['https://shark-app-iq8vp.ondigitalocean.app','https://127.0.0.1']
 
 # Food Data Central API Key
 FDC_API_KEY = config('FDC_API_KEY')
@@ -105,29 +106,29 @@ WSGI_APPLICATION = 'recipeApp.wsgi.application'
 # }
 
 # Local database settings using PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'recipe',
-        'USER': 'postgres',
-        'PASSWORD': '1',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
-# Deployment database settings using PostgreSQL
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': DB_NAME,
-#         'USER': DB_USER,
-#         'PASSWORD': DB_PASSWORD,
-#         'HOST': DB_HOST,
-#         'PORT': DB_PORT,
-#         'sslmode': DB_SSLMODE,
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'recipe',
+#         'USER': 'postgres',
+#         'PASSWORD': '1',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
 #     }
 # }
+
+# Deployment database settings using PostgreSQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
+        'sslmode': DB_SSLMODE,
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

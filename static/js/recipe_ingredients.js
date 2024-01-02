@@ -16,9 +16,17 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="col-md-1">
                 <label for="unit-${newIngredientId}" class="form-label">Unit:</label>
                 <select class="form-select" id="unit-${newIngredientId}" name="amountUnits">
+                    <option value="num">num</option>
                     <option value="gr">gr</option>
                     <option value="kg">kg</option>
-                    <option value="spoon">Spoon</option>
+                    <option value="mL">milliliter</option>
+                    <option value="l">liter</option>
+                    <option value="c">cup</option>
+                    <option value="tbsp">tablespoon</option>
+                    <option value="tsp">teaspoon</option>
+                    <option value="oz">ounce</option>
+                    <option value="fl. oz">fluid ounce</option>
+                    <option value="lb">pound</option>
                 </select>
             </div>
             <div class="col-md-9">
